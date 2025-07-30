@@ -26,7 +26,6 @@ const (
 
 const PROMPT = ">> "
 
-// 添加 colorizeInput 函数
 func colorizeInput(input string) string {
 	l := lexer.New(input)
 	var colored strings.Builder
