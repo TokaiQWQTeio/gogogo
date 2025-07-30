@@ -30,6 +30,7 @@ type ReturnStatement struct {
 
 func (rs *ReturnStatement) statementNode() {}
 
+// let x = 10;
 type LetStatement struct {
 	Token token.TokenType
 	Name  *Identifier
@@ -59,6 +60,7 @@ func (es *ExpressionStatement) statementNode() {}
 type Expression interface {
 	Node
 	expressionNode()
+	// 返回当前表达式的字符串表示
 }
 
 type Identifier struct {

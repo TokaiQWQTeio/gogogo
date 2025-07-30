@@ -83,10 +83,12 @@ func (l *Lexer) NextToken() token.Token {
 			tok.Type = token.LookupIdent(tok.Literal)
 			return tok
 		} else if isDigit(l.ch) {
+			//是不是数字
 			tok.Type = token.INT
 			tok.Literal = l.readTarget(isDigit)
 			return tok
 		} else {
+			//什么都不是
 			tok = newToken(token.ILLEGAL, l.ch)
 		}
 	}
@@ -145,10 +147,12 @@ func (l *Lexer) readString() string {
 	return l.input[position:l.offset]
 }
 
+// 判断是不是字母
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z' || ch == '_'
 }
 
+// 判断是不是引号
 func isQuotation(ch byte) bool {
 	return ch == '"'
 }
