@@ -12,6 +12,7 @@ import (
 	"strings"
 )
 
+// 添加颜色常量
 const (
 	RESET  = "\033[0m"
 	RED    = "\033[31m"
@@ -25,6 +26,7 @@ const (
 
 const PROMPT = ">> "
 
+// 添加 colorizeInput 函数
 func colorizeInput(input string) string {
 	l := lexer.New(input)
 	var colored strings.Builder
