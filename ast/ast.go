@@ -19,6 +19,7 @@ type Program struct {
 // return、let、块语句{}、表达式语句
 type Statement interface {
 	Node
+	// 返回当前语句的字符串表示
 	statementNode()
 }
 
@@ -33,12 +34,15 @@ func (rs *ReturnStatement) statementNode() {}
 // let x = 10;
 type LetStatement struct {
 	Token token.TokenType
-	Name  *Identifier
+	// 标识符
+	Name *Identifier
+	// 表达式
 	Value Expression
 }
 
 func (ls *LetStatement) statementNode() {}
 
+// 块语句
 type BlockStatement struct {
 	Token      token.TokenType
 	Statements []Statement
@@ -46,6 +50,7 @@ type BlockStatement struct {
 
 func (bs *BlockStatement) statementNode() {}
 
+// 表达式语句
 type ExpressionStatement struct {
 	Token      token.TokenType // 该表达式中的第一个词法单元
 	Expression Expression
@@ -63,6 +68,7 @@ type Expression interface {
 	// 返回当前表达式的字符串表示
 }
 
+// 标识符
 type Identifier struct {
 	Token token.TokenType // token.IDENT词法单元
 	Value string
@@ -91,17 +97,22 @@ type IntegerLiteral struct {
 
 func (il *IntegerLiteral) expressionNode() {}
 
+// if
 type IfExpression struct {
-	Token       token.TokenType // 'if'词法单元
-	Condition   Expression
+	Token token.TokenType // 'if'词法单元
+	// 条件
+	Condition Expression
+	// then
 	Consequence *BlockStatement
+	// else
 	Alternative *BlockStatement
 }
 
 func (ie *IfExpression) expressionNode() {}
 
 type FunctionLiteral struct {
-	Token      token.TokenType // 'fn'词法单元
+	Token token.TokenType // 'fn'词法单元
+	// 参数
 	Parameters []*Identifier
 	Body       *BlockStatement
 }

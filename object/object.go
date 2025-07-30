@@ -61,9 +61,12 @@ func (n *Null) Inspect() string  { return "null" }
 
 // 每一个函数会有自己的Env环境
 type Function struct {
+	// 参数
 	Parameters []*ast.Identifier
-	Body       *ast.BlockStatement
-	Env        *Environment
+	// 函数体
+	Body *ast.BlockStatement
+	// 环境
+	Env *Environment
 }
 
 func (f *Function) Type() ObjectType { return FUNCTION_OBJ }

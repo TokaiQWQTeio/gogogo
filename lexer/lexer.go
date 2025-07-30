@@ -9,6 +9,7 @@ type Lexer struct {
 	ch       byte   // offset 偏移的位置的字符
 }
 
+// 创建一个lexer
 func New(input string) *Lexer {
 	l := &Lexer{input: input}
 	l.readChar()
@@ -128,10 +129,12 @@ func (l *Lexer) peekChar() byte {
 // 如果遇到属于标识符的范围的字符进行继续读取操作,直到l.ch不是范围内的字符
 // 根据切片的左闭右开原则,进行字符串的截取操作,传入的参数可以是标识符函数和数字函数
 func (l *Lexer) readTarget(f func(ch byte) bool) string {
+	// 记录当前位置
 	position := l.offset
 	for f(l.ch) {
 		l.readChar()
 	}
+	// 返回截取的字符串
 	return l.input[position:l.offset]
 }
 

@@ -65,6 +65,7 @@ func New(l *lexer.Lexer) *Parser {
 	return p
 }
 
+// 解析程序
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{} // 生成一个程序的根节点
 	program.Statements = []ast.Statement{}
@@ -95,15 +96,19 @@ func (p *Parser) parseStatement() ast.Statement {
 // 标识符之后期望是一个赋值=token
 func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: p.curToken.Type}
+	// 表示当前token是let语句
 	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
+	// 将标识符添加到let语句中
 	stmt.Name = &ast.Identifier{Token: p.curToken.Type, Value: p.curToken.Literal}
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
 	}
 	p.nextToken()
+	// 解析表达式
 	stmt.Value = p.parseExpression(LOWEST)
+	// 判断是否是分号
 	if p.peekTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
@@ -135,10 +140,12 @@ func (p *Parser) parseExpressionStatement() *ast.ExpressionStatement {
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	// 首先是前缀解析获取前缀表达式
 	prefix := p.prefixParseFns[p.curToken.Type]
+	// 如果没有前缀解析函数,则返回错误
 	if prefix == nil {
 		p.noPrefixParseFnError(p.curToken.Type)
 		return nil
 	}
+	// 调用前缀解析函数
 	leftExp := prefix()
 	// 之后进行中缀解析,只有当优先级较大的时候才会执行下面的循环
 	// 例如 3+5*6 进入该函数我们会发现如果右面的表达式的优先级大于当前的会先解析右面的
@@ -155,12 +162,16 @@ func (p *Parser) parseExpression(precedence int) ast.Expression {
 	return leftExp
 }
 
+// 解析标识符
 func (p *Parser) parseIdentifier() ast.Expression {
+	// 生成一个标识符
 	return &ast.Identifier{Token: p.curToken.Type, Value: p.curToken.Literal}
 }
 
+// 解析整数
 func (p *Parser) parseIntegerLiteral() ast.Expression {
 	lit := &ast.IntegerLiteral{Token: p.curToken.Type}
+	// 将当前token的Literal转换成int64
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
 	if err != nil {
 		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Literal)
@@ -171,10 +182,12 @@ func (p *Parser) parseIntegerLiteral() ast.Expression {
 	return lit
 }
 
+// 解析字符串
 func (p *Parser) parseStringLiteral() ast.Expression {
 	return &ast.StringLiteral{Token: p.curToken.Type, Value: p.curToken.Literal}
 }
 
+// 解析布尔值
 func (p *Parser) parseBoolean() ast.Expression {
 	return &ast.Boolean{Token: p.curToken.Type, Value: p.curTokenIs(token.TRUE)}
 }
@@ -242,12 +255,14 @@ func (p *Parser) parsePrefixExpression() ast.Expression {
 	return expression
 }
 
+// 解析[]
 func (p *Parser) parseArrayLiteral() ast.Expression {
 	array := &ast.ArrayLiteral{Token: p.curToken.Type}
 	array.Elements = p.parseExpressionList(token.RBRACKET)
 	return array
 }
 
+// 解析[]里面的元素
 func (p *Parser) parseExpressionList(end token.TokenType) []ast.Expression {
 	list := []ast.Expression{}
 	if p.peekTokenIs(end) {
@@ -359,15 +374,18 @@ func (p *Parser) peekError(t token.TokenType) {
 	p.errors = append(p.errors, msg)
 }
 
+// 没有前缀解析函数
 func (p *Parser) noPrefixParseFnError(t token.TokenType) {
 	msg := fmt.Sprintf("no prefix parse function for %s found", t)
 	p.errors = append(p.errors, msg)
 }
 
+//go:inline
 func (p *Parser) curTokenIs(t token.TokenType) bool {
 	return p.curToken.Type == t
 }
 
+//go:inline
 func (p *Parser) peekTokenIs(t token.TokenType) bool {
 	return p.peekToken.Type == t
 }
@@ -416,6 +434,7 @@ func (p *Parser) curPrecedence() int {
 func (p *Parser) parseIndexExpression(left ast.Expression) ast.Expression {
 	exp := &ast.IndexExpression{Token: p.curToken.Type, Left: left}
 	p.nextToken()
+	// 解析下标
 	exp.Index = p.parseExpression(LOWEST)
 	if !p.expectPeek(token.RBRACKET) {
 		return nil
@@ -432,10 +451,12 @@ type (
 	infixParseFn  func(ast.Expression) ast.Expression
 )
 
-// 将相关的tokenType注册到对应的函数上面
+//将相关的tokenType注册到对应的函数上面
+
 func (p *Parser) registerPrefix(tokenType token.TokenType, fn prefixParseFn) {
 	p.prefixParseFns[tokenType] = fn
 }
+
 func (p *Parser) registerInfix(tokenType token.TokenType, fn infixParseFn) {
 	p.infixParseFns[tokenType] = fn
 }
