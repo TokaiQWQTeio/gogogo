@@ -5,6 +5,7 @@ import (
 	"testing"
 )
 
+// Quote
 func TestQuote(t *testing.T) {
 	tests := []struct {
 		input    string
