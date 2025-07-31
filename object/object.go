@@ -31,7 +31,18 @@ const (
 	ARRAY_OBJ        = "ARRAY"
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 	ERROR_OBJ        = "ERROR"
+	QUOTE_OBJ        = "QUOTE"
 )
+
+type Quote struct {
+	Node ast.Node
+}
+
+func (q *Quote) Type() ObjectType { return QUOTE_OBJ }
+
+func (q *Quote) Inspect() string {
+	return fmt.Sprintf("quote(%s)", q.Node.String())
+}
 
 type Integer struct {
 	Value int64

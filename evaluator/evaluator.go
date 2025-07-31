@@ -47,6 +47,13 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 		body := node.Body
 		return &object.Function{Parameters: params, Env: env, Body: body}
 	case *ast.CallExpression:
+		// 检查函数是否是标识符，且值为 "quote"
+		if identifier, ok := node.Function.(*ast.Identifier); ok && identifier.Value == "quote" {
+			if len(node.Arguments) != 1 {
+				return newError("wrong number of arguments to quote. got=%d, want=1", len(node.Arguments))
+			}
+			return quote(node.Arguments[0])
+		}
 		function := Eval(node.Function, env) // 根据函数的变量名在当前的环境map中获取对应的值
 		if isError(function) {
 			return function
